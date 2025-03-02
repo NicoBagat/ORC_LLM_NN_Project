@@ -1,6 +1,7 @@
 AIM:Use a large language model powered neural network to estimate a value function for an optimal control problem
 
 PROJECT DEVELOPEMENT STEPS:
+
     1. PROBLEM FORMULATION
         '1. Define the OCP (Optimal Control Problem) for the single pendulum
         '2. Specify state dynamics, cost function and constraints
