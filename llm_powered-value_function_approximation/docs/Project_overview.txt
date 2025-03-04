@@ -1,0 +1,72 @@
+____________________________________________________________________________________________________________________________________________________
+LLM POWERED APPROXIMATION OF A VALUE FUNCTION 
+    This project aims to approximate a Value function that can be used as a terminal cost in an MPC formulation for pendulum dynamics
+
+
+____________________________________________________________________________________________________________________________________________________
+Workflow
+____________________________________________________________________________________________________________________________________________________
+    1. Generate training data
+    -   Solve multiple optimal control problems (OCPs) for different initial states (x_0)
+    -   Store initial states (x_0) and corresponding optimal costs ( J(x_0) )
+
+    2. Design & Train neural network
+    -   Design a neural network using PyTorch
+    -   Train the neural network to approximate the mapping between initial states and optimal costs
+    -   Validate the network on unseen iniitial states to ensure food prediction accuracy
+    
+    3. Implement terminal cost
+    -   Use the trained neural network as a terminal cost in an OCP
+    -   Solve the OCP with a shorter horizon and compare performance with the original full-horizon problem 
+
+    4. Results comparison
+    -   Empirically show that the introduction of the neural network-based terminal cost compensates for the shorter horizon in the MPC
+
+____________________________________________________________________________________________________________________________________________________
+Files & Directories overview
+____________________________________________________________________________________________________________________________________________________
+    
+    Main files
+        1.  main.py
+            - Manages the entire workflow from training data to running MPC with the neural network terminal cost
+            - Condiguratble via _**config.yaml**_ file
+
+        2. config.yaml
+            - Central configuration file for the project
+            - Defines parameters such as pendulum type (single / double), OCP settings, neural network hyperparameters and file paths
+
+    Directories
+        1.  data/
+            - Stores raw data and processed results
+            - Includes initial states, optimal costs and MPC results
+
+        2.  models/
+            - Contains trained neural network model files
+
+        3.  src/
+            - Houses all source code files
+
+    Source code files
+
+        1.  dynamics.py
+            - Defines the equations of motion for single 
+            - Allows selection of dynamics based on the dynamics_type parameter in config.yaml
+
+        2.  cost_function.py
+            - Constains and sovle function definitions for OCP (e.g. quadratic costs)
+
+
+        3.  ocp_solver.py
+            - Defines and solves OCPs using numerical optimization methods
+            - Includes functionality to integrate the neural nwtwork terminal cost
+
+        4.  neural_network.py
+            - Implements the neural network model
+            - Provides training, saving, and loading functions.
+
+        5.  numerical_integration.py
+            - Implements numerical integration methods (e.g. RUnge-Kutta).
+
+        6.  utils.py
+            - Contains helper functions such as logging, data saving/loading and configuration parsing
+

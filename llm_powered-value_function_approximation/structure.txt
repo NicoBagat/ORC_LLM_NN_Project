@@ -1,0 +1,21 @@
+project_root/
+│
+├── config.yaml           # Configuration file for the project.
+├── main.py               # Main entry point for running the project.
+│
+├── data/
+│   ├── raw/              # Directory for raw data (initial states, costs).
+│   ├── processed/        # Directory for processed data and results.
+│
+├── models/
+│   └── trained_model.pt  # Trained neural network model file.
+│
+├── src/                  # Source code directory.
+│   ├── dynamics.py       # Implements single and double pendulum dynamics.
+│   ├── cost_functions.py # Cost function definitions for OCP.
+│   ├── ocp_solver.py     # Defines and solves OCPs.
+│   ├── neural_network.py # Neural network architecture and training.
+│   ├── numerical_integration.py # Numerical integration methods.
+│   └── utils.py          # Utility functions for the project.
+│
+└── requirements.txt      # Python dependencies for the project.
