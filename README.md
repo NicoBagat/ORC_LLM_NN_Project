@@ -1,7 +1,7 @@
 #   Value function approximation for MPC
-    This repository implements a method to approximate a Value function using a neural network, 
-    which is used as a terminal cost in Model Predictive Control (MPC).
-    The method is tested on single and double pendulum syustems.
+This repository implements a method to approximate a Value function using a neural network, 
+which is used as a terminal cost in Model Predictive Control (MPC).
+The method is tested on single and double pendulum syustems.
 
 ##   Workflow
 1. Solve multiple OCPs to generate training data
