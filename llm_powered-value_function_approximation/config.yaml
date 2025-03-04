@@ -1,0 +1,15 @@
+ocp:
+  dynamics_type: "single_pendulum"    # Choose between "single_pendulum" or "double_pendum"
+  state_dim: 2                        # State dimension for single pendulum
+  control_dim: 1                      # Control dimension for single pendulum
+  horizon: 20                         # Time horizon
+  dt: 0.1                             # Time step
+  cost_function:
+    type: "quadratic"                       # Cost function type
+    state_weight: 1.0                       # Weight for state deviation
+    control_weight: 0.01                    #  Weight for control effort
+    target_State: [0.0, 0.0]                # Target state for the system
+
+  training:
+    num_initial_states: 50                  # Number of random initial states
+    save_path: "data/raw/training_data.pt"  # Path to save training data
