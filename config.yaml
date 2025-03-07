@@ -1,15 +1,25 @@
-ocp:
-  dynamics_type: "single_pendulum"  # Choose between "single_pendulum" or "double_pendulum"
-  state_dim: 2                     # State dimension for single pendulum
-  control_dim: 1                   # Control dimension for single pendulum
-  horizon: 20                      # Time horizon
-  dt: 0.1                          # Time step
-  cost_function:
-    type: "quadratic"              # Cost function type
-    state_weight: 1.0              # Weight for state deviation
-    control_weight: 0.01           # Weight for control effort
-    target_state: [0.0, 0.0]       # Target state for the system
+steps:
+  generate_training_data: true
+  train_neural_network: true
+  run_mpc_with_nn: true
 
-training:
-  num_initial_states: 50           # Number of random initial states
-  save_path: "data/raw/training_data.pt"  # Path to save training data
+ocp:
+  dynamics_type: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
+  horizon: 10
+  state_dim: 2
+  control_dim: 1
+  dt: 0.1
+  cost_weights:
+    state: [1.0, 1.0]  # Weights for state dimemsions
+    control: 0.01      # Weight for control inputs
+
+mpc:
+  short_horizon: 5
+  test_states:
+    - [0.1, 0.2]
+    - [0.3, -0.4]
+
+paths:
+  training_data: "data/processed/training_data.npy"
+  model: "models/neural_network.pt"
+  mpc_results: "data/processed/mpc_results.pt"
