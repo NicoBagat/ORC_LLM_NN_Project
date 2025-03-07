@@ -15,6 +15,7 @@ The method is tested on single and double pendulum syustems.
 - `docs/` : assignment requests / project developement overview
 - `models/` : constains trained neural network models 
 - `src/`: source code directory with dynamics, OCP solversm, neural network implementations and utilities
+- `scripts/` : holds high-level scripts for specific tasks, distinct from reusable modules in `src`
 
 ## Installation
 1. Clone the repository:
