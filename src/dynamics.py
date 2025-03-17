@@ -1,13 +1,24 @@
 import l4casadi as l4c
 
-def single_pendulum_dynamics(state, control, params):
+
+def single_pendulum_dynamics(params):
     """ Symbolic dynamics of a single pendulum using l4casadi"""
     g, l, b, m = params["g"], params["l"], params["b"], params["m"]
+    
+    ''' 
+    ___________________
+    DYNAMICS VARAIBLES
+    ___________________
+    x = state
+    u = control
+    ___________________
+    '''
     
     def dynamics(x, u):
             theta, omega = x
             torque = u[0]
-            dtheta = omegadomega = -(b / m) * omega - (g / l) * l4c.sin(theta) / (m * l**2)
+            dtheta = omega
+            domega = -(b / m) * omega - (g / l) * l4c.sin(theta) / (m * l**2)
             return [ dtheta,domega]
     
     return dynamics
