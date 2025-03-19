@@ -40,5 +40,5 @@ def solve_ocp(ocp, x0):
         Returns:
             tuple: A tuple containing trajectory, controls and cost.
     '''
-    trajectory, controls, cost = ocp.sovle(x0)
+    trajectory, controls, cost = ocp.solve(x0)
     return trajectory, controls, cost

@@ -1,36 +1,30 @@
-from l4casadi import SX
-from l4casadi import Function
+import l4casadi as l4c
 
 def define_cost_function(config):
     """ 
-    Define the stage and terminal cost functions for the OCP using l4casadi
+    Define the stage and terminal cost functions for the OCP using l4casadi based on the configuration
 
     Args:
-        config(dict): Configuration dictionary with cost parameters
+        config(dict): Configuration dictionary containing cost weights and parameters
         
     Returns:
-        stage_cost (Function): CasADi Function for the stage cost
-        terminal_cost (Function): CasADi Function for the terminal cost
+        Tuple: A tuple containing stage_cost and terminal_cost functions compatible with l4casadi
+
     """
-    
-    # Define symbolic variables
-    x = SX.sym("x", config["state_dim"]) # State variables
-    u = SX.sym("u", config["control_dim"]) # control variables
-    
-    # Extract cost weights from config
+    # Extract cost weights from config file
     state_weights = config["cost_weights"]["state"]
     control_weight = config["cost_weights"]["control"]
+
+    # Define symbolic variables
+    x = l4c.SX.sym("x", config["state_dim"]) # State variables
+    u = l4c.SX.sym("u", config["control_dim"]) # Control variables
     
-    # Stage cost: sum of quadratic state and control penalties
-    stage_cost_expr = (
-        sum(state_weights * x**2 + control_weight * sum(u**2))
-    )
+    # Define cost functions
+    stage_cost_expr = l4c.dot(state_weights, x**2) + control_weight * l4c.dot(u, u)
+    terminal_cost_expr = l4c.dot(state_weights, x**2)
     
-    # Terminal cost: quadratic state penalty
-    terminal_cost_expr = sum(state_weights * x**2)
-    
-    # Define CasADi functions
-    stage_cost = Function("stage_cost", [x, u],  [stage_cost_expr])
-    terminal_cost = Function("terminal_cost", [x], [terminal_cost_expr])
-    
+    # Convert expressions to callable functions
+    stage_cost = l4c.Function("stage_cost", [x, u], [stage_cost_expr])
+    terminal_cost = l4c.Function("terminal_cost", [x], [terminal_cost_expr])
+
     return stage_cost, terminal_cost
