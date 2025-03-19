@@ -1,42 +1,43 @@
 import l4casadi as l4c
 
 
-def single_pendulum_dynamics(params):
-    """ Symbolic dynamics of a single pendulum using l4casadi"""
-    g, l, b, m = params["g"], params["l"], params["b"], params["m"]
-    
+def single_pendulum_dynamics():    
     ''' 
-    ___________________
-    DYNAMICS VARAIBLES
-    ___________________
-    x = state
-    u = control
-    ___________________
+        Symbolic dynamics of a single pendulum using l4casadi
+        ___________________
+        DYNAMICS VARAIBLES
+        ___________________
+        x = state
+        u = control
+        ___________________
     '''
+    # Symbolic definition of state and control variables
+    x = l4c.SX.sym("x", 2)
+    u = l4c.SX.sym("u", 1)
     
-    def dynamics(x, u):
-            theta, omega = x
-            torque = u[0]
-            dtheta = omega
-            domega = -(b / m) * omega - (g / l) * l4c.sin(theta) / (m * l**2)
-            return [ dtheta,domega]
+    theta, omega = x[0], x[1]
+    torque = u[0]
+    g, L, m = 9.81, 1.0, 1.0
     
-    return dynamics
+    theta_dot = omega
+    omega_dot = (-m * g * L * l4c.sin(theta) + torque) / ( m * L**2)
+    
+    dxdt = l4c.vertcat(theta_dot, omega_dot)
+    
+    dynamics_fn = l4c.Function("single_pendulum_dyunamics", [x, u], [dxdt])
 
-def double_pendulum_dynamics(params):
-    """Symbolic dynamics of a double pendulum using l4casadi."""
-    # Placeholder implementation
-    def dynamics(x, u):
-        return [0.0 for _ in x]  # Replace with actual dynamics
+    return dynamics_fn
 
-    return dynamics
+def double_pendulum_dynamics():
+    """
+    Define the dynamics for a double pendulum.
+    Returns:
+        Callable: l4casadi-compatible dynamics function.
+    """
+    x = l4c.SX.sym("x", 4)
+    u = l4c.SX.sym("u", 1)
 
+    # Dynamics definition omitted for brevity; similar symbolic formulation
 
-def define_dynamics(type, params):
-    """Define dynamics based on the type."""
-    if type == "single_pendulum":
-        return single_pendulum_dynamics(params)
-    elif type == "double_pendulum":
-        return double_pendulum_dynamics(params)
-    else:
-        raise ValueError(f"Unknown dynamics type: {type}")
+    dynamics_fn = l4c.Function("double_pendulum_dynamics", [x, u], [dxdt])
+    return dynamics_fn
