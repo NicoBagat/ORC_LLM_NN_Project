@@ -5,7 +5,7 @@ from src.utils import load_config
 
 def main():
     # Load configuration
-    config = load_config("confi.yaml")
+    config = load_config("config.yaml")
     
     # Step 1 : Generate training data
     print("[STEP_1]: Generating trainind data ...")
