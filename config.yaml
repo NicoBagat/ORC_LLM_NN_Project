@@ -12,6 +12,14 @@ ocp:
   cost_weights:
     state: [1.0, 1.0]  # Weights for state dimemsions
     control: 0.01      # Weight for control inputs
+  parameters:
+    gravity: 9.81 # Gravitational accelaration
+    length: 1.0   # Length of the pendulum (single pendulum)
+    mass: 1.0     # Mass of the pendulum (single pendulum)
+    length_1: 1.0  # Length of the 1st rod (double pendulum)
+    length_2: 1.0  # Length of the 2nd rod (double pendulum)
+    mass_1: 1.0    # Mass of the 1st pendulum bob (double pendulum)
+    mass_2: 1.0    # Mass of the 2nd pendulum bob (double pendulum)
 
 mpc:
   short_horizon: 5
