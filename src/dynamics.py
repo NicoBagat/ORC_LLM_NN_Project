@@ -30,7 +30,7 @@ def single_pendulum_dynamics(config):
 
     return dynamics_fn
 
-def double_pendulum_dynamics():
+def double_pendulum_dynamics(config):
     """
     Define the dynamics for a double pendulum.
     Args:
