@@ -13,6 +13,7 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
         Return:
             l4c.OptimalControlProblem: Configured OCP instance
     '''
+    
     # Initialize the OCP
     ocp = l4c.OptimalControlProblem(
         n_states = config["state_dim"],
@@ -21,7 +22,7 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
         dt=config["dt"],
     )
     
-    # Dynamics
+    # Set dynamics
     ocp.set_dynamics(dynamics)
     
     # Set stage cost and terminal cost
@@ -40,5 +41,7 @@ def solve_ocp(ocp, x0):
         Returns:
             tuple: A tuple containing trajectory, controls and cost.
     '''
+    
+    # Solve the OCP
     trajectory, controls, cost = ocp.solve(x0)
     return trajectory, controls, cost
