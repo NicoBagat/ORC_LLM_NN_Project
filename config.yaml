@@ -3,6 +3,7 @@ steps:
   train_neural_network: true
   run_mpc_with_nn: true
 
+# ADDITIONAL FIELDS
 neural_network:
   nn_input_dim: # Number of input neurons (#of ocps)
   nn_hidden_dim: # Number of neurons in hidden layer(s)
