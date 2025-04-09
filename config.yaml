@@ -3,25 +3,47 @@ steps:
   train_neural_network: true
   run_mpc_with_nn: true
 
+neural_network:
+  nn_input_dim: # Number of input neurons (#of ocps)
+  nn_hidden_dim: # Number of neurons in hidden layer(s)
+  nn_output_dim: # Number of neurons in output layer
+  nn_epochs: 
+  nn_batch_size: # 
+  nn_buffer:
+  nn_learning_rate: # step dimension ????
+  nn_activation_function:
+  nn_loss_function: # loss function is defined as MSE (means square error) in 'train_nn.py'
+
+
 ocp:
-  dynamics_type: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
+  dynamics: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
   horizon: 10
   state_dim: 2
   control_dim: 1
   dt: 0.1
+
   cost_weights:
     state: [1.0, 1.0]  # Weights for state dimemsions
     control: 0.01      # Weight for control inputs
+
+  initial_states:      # Add this to define initial states for training
+    angle: [1.0, 1.0]               # Range for initial angle (radians)
+    angular_velocity: [-1.0, 1.0]   # Range for initial angular velocity (rad/s)
+
+  num_initial_states: 100 # Number of initial states to generate
+
   parameters:
-    gravity: 9.81 # Gravitational accelaration
-    length: 1.0   # Length of the pendulum (single pendulum)
-    mass: 1.0     # Mass of the pendulum (single pendulum)
+    gravity: 9.81  # Gravitational accelaration
+    length: 1.0    # Length of the pendulum (single pendulum)
+    mass: 1.0      # Mass of the pendulum (single pendulum)
     length_1: 1.0  # Length of the 1st rod (double pendulum)
     length_2: 1.0  # Length of the 2nd rod (double pendulum)
     mass_1: 1.0    # Mass of the 1st pendulum bob (double pendulum)
     mass_2: 1.0    # Mass of the 2nd pendulum bob (double pendulum)
 
+
 mpc:
+
   short_horizon: 5
   test_states:
     - [0.1, 0.2]

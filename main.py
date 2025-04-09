@@ -1,5 +1,5 @@
 from scripts.generate_training_data import generate_training_data
-from scripts.train_neural_network import train_neural_network
+from scripts.train_nn import train_neural_network
 from scripts.run_mpc_with_nn import run_mpc_with_nn
 from src.utils import load_config
 

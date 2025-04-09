@@ -36,10 +36,10 @@ def solve_ocp(ocp, x0):
     
         Args:
             ocp (l4c.OptimalControlProblem): Configured OCP instance
-            x0 (lsit or ndarray): Initial state
+            x0 (lsit or array): Initial state
             
         Returns:
-            tuple: A tuple containing trajectory, controls and cost.
+            tuple: trajectory (list of states), controls (list of controls), cost (float)
     '''
     
     # Solve the OCP
