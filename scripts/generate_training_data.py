@@ -8,8 +8,8 @@ def generate_training_data(config_path):
     config = load_config(config_path)
     
     # Generate random initial states
-    angle_range = config["ocp"]["initial_state_ranges"]["angle"]
-    angular_velocity_range = config["ocp"]["initial_state_ranges"]["angular_velocity"]
+    angle_range = config["ocp"]["initial_states"]["angle"]
+    angular_velocity_range = config["ocp"]["initial_state"]["angular_velocity"]
     num_states = config["ocp"]["num_initial_states"]
     
     initial_state = [
@@ -23,7 +23,7 @@ def generate_training_data(config_path):
     # Select dynamics based on configuration
     dynamics_fn = (
         single_pendulum_dynamics()
-        if config["dynamics"] == "single_pendulum"
+        if config["ocp"]["dynamics"] == "single_pendulum"
         else double_pendulum_dynamics
     )
     
@@ -42,10 +42,13 @@ def generate_training_data(config_path):
     #Save training data to the specified path
     training_data_path = config["paths"]["training_data"]
     np.save(training_data_path, training_data)
+    print(f"Training data saved to {training_data_path}")
+    
     # If 'dynamics' field is "single_pendulum" load single pendulum dynamics, else load double pendulum dynamics
 
-
-    
-
-        
     return training_data
+
+# Optional execution block for standalone usage
+if __name__ == "__main__":
+    config_path = "config.yaml"
+    generate_training_data(config_path)
