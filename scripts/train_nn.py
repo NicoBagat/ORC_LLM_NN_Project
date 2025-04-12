@@ -9,7 +9,7 @@ from src.neural_network import NeuralNetworkModel
 def train_neural_network(training_data, config):
     
     # Load configuration
-    config = load_config
+    config = load_config(config)
     
     # Extract neural network configuration
     input_dim = config["ocp"]["state_dim"]
