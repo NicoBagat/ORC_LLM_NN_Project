@@ -1,54 +1,60 @@
 import numpy as np
-from src.utils import load_config
-from src.dynamics import single_pendulum_dynamics, double_pendulum_dynamics
+from src.utils import load_config, save_data
 from src.ocp_solver import define_ocp, solve_ocp
+from src.dynamics import single_pendulum_dynamics, double_pendulum_dynamics
 from src.cost_functions import define_cost_function
 
-def generate_training_data(config_path):
-    config = load_config(config_path)
+def generate_training_data(config):
+    """
+    Generate training data by solving OCPs with different initial states
     
-    # Generate random initial states
-    angle_range = config["ocp"]["initial_states"]["angle"]
-    angular_velocity_range = config["ocp"]["initial_state"]["angular_velocity"]
-    num_states = config["ocp"]["num_initial_states"]
+    Args:
+        config (dict): Configuration dictionary
+        
+    Returns:
+        List[Tuple[np.ndarray, float]]: Training data containing initial states and corresponding optimal costs
+    """
     
-    initial_state = [
-        [
-            np.random.uniform(*angle_range),
-            np.random.uniform(*angular_velocity_range),
-        ]
-        for _ in range(num_states)
-    ]
+    #Load configuration 
+    config = load_config(config)
     
-    # Select dynamics based on configuration
+    # Select dynamics function absed on configuration
     dynamics_fn = (
-        single_pendulum_dynamics()
+        single_pendulum_dynamics(config)
         if config["ocp"]["dynamics"] == "single_pendulum"
-        else double_pendulum_dynamics
+        else double_pendulum_dynamics(config)
     )
     
-    # Define the cost functions
+    # Generate initial states
+    num_initial_states = config["ocp"["num_initial_states"]["angle"]]
+    initial_states = []
+    
+    angular_velocity = np.random.uniform(
+        *config["ocp"]["initial_states"]["angular_velocity"]
+    )
+    
+    for _ in range(num_initial_states):
+        angle = np.random.uniform(*config["ocp"]["initial_states"]["angle"])
+        angular_velocity = np.random.uniform(*config["ocp"]["initial_states"]["angular_velocity"])
+        initial_states.append([angle, angular_velocity])
+        
+    # Define the stage and terminal costs
     stage_cost, terminal_cost = define_cost_function(config)
     
-    # Define the OCP
+    # Define OCP
     ocp = define_ocp(config, dynamics_fn, stage_cost, terminal_cost)
     
-    # Solve OCP for each initial state
+    # Solve OCP for each initial state and collect training data
     training_data = []
-    for x0 in config["initial_states"]:
-        trajectory, controls, cost = solve_ocp(ocp, x0)
-        training_data.append((x0, cost))
-        
-    #Save training data to the specified path
-    training_data_path = config["paths"]["training_data"]
-    np.save(training_data_path, training_data)
-    print(f"Training data saved to {training_data_path}")
     
-    # If 'dynamics' field is "single_pendulum" load single pendulum dynamics, else load double pendulum dynamics
-
+    for x0 in initial_states:
+        _, _, optimal_cost = solve_ocp(ocp, x0)
+        training_data.append((x0, optimal_cost))
+        
     return training_data
 
-# Optional execution block for standalone usage
-if __name__ == "__main__":
+if __name__ =="__main__":
+    #Pathg to configuration file
     config_path = "config.yaml"
-    generate_training_data(config_path)
+    training_data = generate_training_data(config_path)
+    print(f"Generated training data: {len(training_data)} data points.")
