@@ -1,7 +1,7 @@
 import numpy as np
+from src.dynamics import single_pendulum_dynamics, double_pendulum_dynamics
 from src.utils import load_config, save_data
 from src.ocp_solver import define_ocp, solve_ocp
-from src.dynamics import single_pendulum_dynamics, double_pendulum_dynamics
 from src.cost_functions import define_cost_function
 
 def generate_training_data(config):
