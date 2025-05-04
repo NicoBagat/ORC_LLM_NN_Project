@@ -3,6 +3,7 @@ steps:
   train_neural_network: true
   run_mpc_with_nn: true
 
+
 ocp:
   dynamics: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
   horizon: 10
@@ -19,6 +20,10 @@ ocp:
     angular_velocity: [-1.0, 1.0]   # Range for initial angular velocity (rad/s)
 
   num_initial_states: 100 # Number of initial states to generate
+  control_bounds: [-10.0, 10.0] # Range for min/max control variable ('u') values
+  stae_bunds:
+    - [-np.pi, -10.0]
+    - [np.pi, 10.0]
 
   parameters:
     gravity: 9.81  # Gravitational accelaration
@@ -29,8 +34,8 @@ ocp:
     mass_1: 1.0    # Mass of the 1st pendulum bob (double pendulum)
     mass_2: 1.0    # Mass of the 2nd pendulum bob (double pendulum)
 
-mpc:
 
+mpc:
   short_horizon: 5
   test_states:
     - [0.1, 0.2]

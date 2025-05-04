@@ -13,7 +13,7 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
            tuple: A tuple containing OCP problem parameters, CasADi symbolic variables and dynamics
     '''
 
-    # Initialize the OCP
+    # Load "ocp" parameters from config file
     state_dim = config["ocp"]["state_dim"]
     control_dim = config["ocp"]["control_dim"]
     horizon = config["ocp"]["horizon"]
@@ -24,7 +24,7 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
     x = cs.MX.sym("x", state_dim)   # State variable
     u = cs.MX.sym("u", control_dim) # Control variable
     
-    # Set dynamics
+    # Dynamics definition (based on active dynamic in config file)
     dynamics_fn = (
         single_pendulum_dynamics(config)
         if config["ocp"]["dynamics"] == "single_pendulum"
@@ -42,18 +42,37 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
     # Set objective function
     Q = cs.diag(cs.MX(cost_weights["state"]))
     R = cs.MX(cost_weights["control"])
-    
         
     # Set stage cost and terminal cost
+    
+    # Stage cost
     def stage_cost(x, u):
         return cs.mtimes([x.T, Q, x]) + cs.mtimes([u.T, R, u])
     
     ocp.set_Stage_cost(stage_cost)
-
+    
+    # Terminal cost
     def terminal_cost(x):
         return cs.tmtime([x.T, Q, x])
     
     ocp.set_terminal_cost(terminal_cost)
+    
+    # Add control bounds (if specified in config)
+    if "control_bounds" in config["ocp"]:
+        u_min, u_max = config["ocp"]["control_bounds"]
+        ocp.add_control_bound(u_min, u_max)
+        
+    # Add state bounds (if specified in config)
+    if "state_bounds" in config["ocp"]:
+        x_min, x_max = config["ocp"]["state_bounds"]
+        ocp.add_state_bound(x_min, x_max)
+    
+    # Set solver options
+    solver_options = {
+        "ipopt.print_level":0,
+        "print_time": False        
+    }
+    ocp.set_solver_options(solver_options)
     
     return ocp, x, u, dynamics_fn
 
