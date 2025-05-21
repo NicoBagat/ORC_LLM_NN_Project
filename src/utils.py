@@ -38,7 +38,7 @@ def load_data(path):
     Returns:
         numpy.ndarray: Loaded data
     """
-    return np.load(path)
+    return np.load(path, allow_pickle=True)
 
 def save_model(model, path):
     """
@@ -68,23 +68,3 @@ def load_model(path, model_class, config):
     model.load_state_dict(torch.load(path))
     print(f"Model loaded from {path}")
     return model
-
-def normalize_data(x, y):
-    """
-    Normalize input and output data for training.
-    
-    Args:
-        x (numpy.ndarray): Input features.
-        y (numpy/ndarray): Ouput targets.
-        
-        Returns:
-        tuple: Normalized input and output data.
-        
-    """
-    x_mean, x_std = np.mean(x, axis=0), np.std(x, axis=0)
-    y_mean, y_std = np.mean(y, axis=0), np.std(y, axis=0)
-    
-    x_norm = (x - x_mean) / x_std
-    y_norm = (y - y_mean) / y_std
-    
-    return x_norm, y_norm
