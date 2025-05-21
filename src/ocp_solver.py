@@ -2,7 +2,7 @@ import l4casadi as l4c
 import casadi as cs
 from src.dynamics import single_pendulum_dynamics, double_pendulum_dynamics
 
-def define_ocp(config, dynamics, stage_cost, terminal_cost):
+def define_ocp(config):
     ''' 
     Define the OCP based on the configuration 
         
@@ -31,19 +31,26 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
         else double_pendulum_dynamics(config)
     )
     
+    # Ensure 1D output for dynamics
+    ''' 
+    Use case of following function:
+        - lambda:   wraps the selected 'dynamics_fn'
+        - 'dynamics_fn(x, u) computes the system's state derivatives given current state and control input
+        - 'reshape(-1): flattens output into a 1D array
+    '''
     f = lambda x, u: dynamics_fn(x, u).reshape(-1)
     
-    # Define the OCP structure
+    # DEFINE OCP STRUCTURE
     ocp = l4c.OptimalControlProblem()
     ocp.add_state(x)
     ocp.add_control(u)
     ocp.set_dynamics(f, dt=dt)
     
-    # Set objective function
+    # SET OBJECTIVE FUNCTION
     Q = cs.diag(cs.MX(cost_weights["state"]))
     R = cs.MX(cost_weights["control"])
         
-    # Set stage cost and terminal cost
+    # SET STAGE AND TERMINAL COST
     
     # Stage cost
     def stage_cost(x, u):
@@ -56,23 +63,6 @@ def define_ocp(config, dynamics, stage_cost, terminal_cost):
         return cs.tmtime([x.T, Q, x])
     
     ocp.set_terminal_cost(terminal_cost)
-    
-    # Add control bounds (if specified in config)
-    if "control_bounds" in config["ocp"]:
-        u_min, u_max = config["ocp"]["control_bounds"]
-        ocp.add_control_bound(u_min, u_max)
-        
-    # Add state bounds (if specified in config)
-    if "state_bounds" in config["ocp"]:
-        x_min, x_max = config["ocp"]["state_bounds"]
-        ocp.add_state_bound(x_min, x_max)
-    
-    # Set solver options
-    solver_options = {
-        "ipopt.print_level":0,
-        "print_time": False        
-    }
-    ocp.set_solver_options(solver_options)
     
     return ocp, x, u, dynamics_fn
 
