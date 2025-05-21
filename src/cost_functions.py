@@ -1,5 +1,4 @@
 import l4casadi as l4c
-from src.utils import load_config
 
 def define_cost_function(config):
     """ 
@@ -29,12 +28,3 @@ def define_cost_function(config):
     terminal_cost = l4c.Function("terminal_cost", [x], [terminal_cost_expr])
 
     return stage_cost, terminal_cost
-
-# Optional execution block for testing this module directly
-if __name__ == "__main__":
-    # Load the configuration file
-    config_path = "config.yaml"
-    config = load_config(config_path)
-    
-    # Define cost functions
-    stage_cost, terminal_cost = define_cost_function(config)
