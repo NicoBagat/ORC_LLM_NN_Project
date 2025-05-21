@@ -1,5 +1,4 @@
 import l4casadi as l4c
-from src.utils import load_config
 
 def single_pendulum_dynamics(config):    
     ''' 
@@ -61,13 +60,16 @@ def double_pendulum_dynamics(config):
     theta1, omega1, theta2, omega2 = x[0], x[1], x[2], x[3]
     torque1, torque2 = u[0], u[1]
     
+    # (angular) Speed
     theta1_dot = omega1
     theta2_dot = omega2
+    
+    # (angular) Acceleration 
     omega1_dot = (m2 * g * l4c.sin(theta2) - m1 * g * L1 * l4c.sin(theta1) + torque1) / (m1 * L1**2)
     omega2_dot = (m2 * g * l4c.sin(theta2) - m2 * L2 * l4c.sin(theta1) + torque2) / (m2 * L2**2)
     
     dxdt = l4c.vertcat(theta1_dot, omega1_dot, theta2_dot, omega2_dot)
-    
+
 
     # Create and return the dynamics funciton
     dynamics_fn = l4c.Function("double_pendulum_dynamics", [x, u], [dxdt])
