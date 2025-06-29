@@ -1,44 +1,65 @@
+import numpy as np
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset, random_split
-from src.utils import load_config, save_model, normalize_data
+from torch.utils.data import DataLoader, TensorDataset
 from src.neural_network import NeuralNetworkModel
+from src.utils import save_model, load_data, load_config
 
-def train_neural_network(training_data, config):
+
+def train_neural_network(config_path="config.yaml"):
+    '''
+    Train a neural network on the generated training data.
+    Args:
+        config_path (str): Path to the configuration file.
+    Returns:
+        NeuralNetworkModel: Trained neural network model.
+    '''
+    # Load configuration
+    config = load_config(config_path)
+    
+    # Load trainig data
+    training_data = load_data(config["paths"]["training-data"])
+    x_data, y_data = zip(*training_data)
+    x_data, y_data = np.array(x_data), np.array(y_data)
     
     # Normalize data
-    x_train, y_train = normalize_data(training_data[:, :-1], training_data[:, -1].reshape(-1, 1))
+    x_mean = np.mean(x_data, axis=0)    #'x' mean
+    x_std = np.std(x_data, axis=0)      #'x' standard deviation
     
-    # Create dataset and split into train/validation
-    dataset = TensorDataset(torch.tensor(x_train).float(), torch.tensor(y_train).float())
-    train_size = int(0.8 * len(dataset))
-    val_size = len(dataset) - train_size
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    y_mean = np.mean(y_data)        #'y' mean
+    y_std = np.std(y_data)          #'y' standard deviation
     
-    # Create Dataloaders
-    batch_size = config["neural_network"]["nn_batch_size"]
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    x_data = (x_data - x_mean) / x_std
+    y_data = (y_data - y_mean) / y_std
     
-    # Initialize model
-    model = NeuralNetworkModel(config)
-    criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=config["neural_network"]["nn_learning_rate"])
+    # Prepare the Dataloader
+    dataset = TensorDataset(torch.tensor(x_data, dtype=torch.float32),
+                            torch.tensor(y_data, dtype=torch.float32))
     
-    # Training loop with early stopping
-    best_val_loss = float("inf")
-    patience = 5
-    patience_counter = 0
+    dataloader = DataLoader(dataset, batch_size=config["neural_network"]["nn_batch_size"], shuffle=True)
     
+    # INITIALIZE THE NEURAL NETWORK
+    nn_model = NeuralNetworkModel(config_path)
+    optimizer = torch.optim.Adam(nn_model.parameters(), lr=config["neural_network"]["nn_learning_rate"])
+    loss_fn = torch.nn.MSELoss() #Criterion for MSE (Mean Square Error) measurement
+    
+    # Train the neural network
     for epoch in range(config["neural_network"]["nn_epochs"]):
-        model.train()
-        train_loss = 0
-        for batch_x, batch_y in train_loader:
-            optimizer.zero_grad
-        
-if __name__ == "__main__":
+        for x_batch, y_batch in dataloader:
+            optimizer.zero_grad()   #Reset the gradients for all optimized class
+            predictions = nn_model(x_batch)
+            loss = loss_fn(predictions, y_batch)
+            loss.backward()
+            
+            '''
+            backward(): method used in PyTorch to calculate the gradient dureing the backward pass in the neural network.
+
+                -> not calling backward will cause the gradients for the tensor to not be computed
+            '''
+            optimizer.step() #Perform optimization step
     
-    # Path to config.yaml
-    config_path = "config.yaml"
-    train_neural_network(config_path)
+    # Save the trained model
+    save_model(nn_model, config_path["paths"]["model"])
+    return nn_model
+    
+    
+    
