@@ -33,3 +33,17 @@ The method is tested on single and double pendulum syustems.
 2. Run the workflow
 
     `python main.py`
+
+
+## Code functionalities
+- ### `ocp_solver.py`
+    #### 1. Configuration and Dynamics
+    The code uses the configuration loaded from config.yaml to extract parameters like the horizon, state dimension, control dimension and dynamics type (`single_pendulum` or `double_pendulum`)
+
+    #### 2. Cost function
+    #### 3. Decision variables
+    #### 4. Constraints and Objective
+    #### 5. Solver
+    #### 6. Results
+
+- ### `generate_training_data.py`
