@@ -1,21 +1,23 @@
 import torch
 import torch.nn as nn
-from src.utils import load_config
+from utils import load_config
+from casadi import MX, Function
+import l4casadi as l4c
 
 class NeuralNetwork(nn.Module):
     '''
-    Neural network to approximate the Value function
+    Simple feedforward neural network to approximate the Value function
     Inputs:
         - Initial state x0
     Outputs:
         - Predicted optimal cost J(x0)
         
-    input_dim: # input layer neurons
-    hidden_dim: # hiddenlayer neurons
-    output_dim: # output layer neurons
+    input_size: # input layer neurons
+    hidden_size: # hiddenlayer neurons
+    output_size: # output layer neurons
     '''
     
-    def __init__(self, input_size, hidden_size, output_size, activation=nn.Tanh(), ub=None):
+    def __init__(self, input_size, hidden_size, output_size, activation=nn.Tanh(), ub=1):
         super().__init__()
         
         # Define the model architecture
@@ -27,7 +29,7 @@ class NeuralNetwork(nn.Module):
             nn.Linear(hidden_size, output_size),
             activation,
         )
-        self.ub = ub if ub is not None else 1
+        self.ub = ub
         self.initialize_weights()
         
     def forward(self, x):
@@ -48,5 +50,32 @@ class NeuralNetwork(nn.Module):
         output_size = config["neural_network"]["nn_output_dim"]
         activation = nn.Tanh() # or nn.ReLU() if you prefer
         ub = config["neural_network"].get("nn_output_ub", 1)
-        
         return cls(input_size, hidden_size, output_size, activation, ub)
+    
+    
+    def create_casadi_function(self, config_path, load_weights=True):
+        """
+        Create a CasADi function from the neural network using l4casadi.
+        Loads weights from the model path specified in the config if load_weights is True.
+        """
+        
+        config = load_config(config_path)
+        input_size = config["ocp"]["state_dim"]
+        model_path = config["paths"]["model"]
+        
+        if load_weights:
+            devide = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.load_state_dict(torch.load(model_path, map_location=devide))
+            
+        state = MX.sym("x", input_size)
+        l4c_model = l4c.L4CasADi(self,
+                                 device="cuda" if torch.cuda.is_available() else "cpu",
+                                 name='nn_model',
+                                 build_dir='models/l4c_build'
+                                 )
+        
+        nn_model = l4c_model(state)
+        
+        # This is the function you can use in a CasADi problem
+        nn_func = Function('nn_func', [state], [nn_model])
+        return nn_func
