@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from src.utils import load_config
 
-class NeuralNetworkModel(nn.Module):
+class NeuralNetwork(nn.Module):
     '''
     Neural network to approximate the Value function
     Inputs:
@@ -15,23 +15,38 @@ class NeuralNetworkModel(nn.Module):
     output_dim: # output layer neurons
     '''
     
-    def __init__(self, config_path):
-        super(NeuralNetworkModel, self).__init__()
-        
-        # Load configuration data
-        config = load_config(config_path)
-        input_dim = config["ocp"]["state_dim"]
-        hidden_dim = config["neural_network"]["nn_hidden_dim"]
-        output_dim = config["neural_network"]["nn_output_dim"]
+    def __init__(self, input_size, hidden_size, output_size, activation=nn.Tanh(), ub=None):
+        super().__init__()
         
         # Define the model architecture
-        self.model = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, output_dim)
+        self.linear_stack = nn.Sequential(
+            nn.Linear(input_size, hidden_size),
+            activation,
+            nn.Linear(hidden_size, hidden_size),
+            activation,
+            nn.Linear(hidden_size, output_size),
+            activation,
         )
-    
+        self.ub = ub if ub is not None else 1
+        self.initialize_weights()
+        
     def forward(self, x):
-        return self.model(x)
+        out = self.linear_stack(x) * self.ub
+        return out
+    
+    def initialize_weights(self):
+        for layer in self.linear_stack:
+            if isinstance(layer, nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
+                nn.init.zeros_(layer.bias)
+    
+    @classmethod
+    def from_config(cls, config_path):
+        config = load_config(config_path)
+        input_size = config["ocp"]["state_dim"]
+        hidden_size = config["neural_network"]["nn_hidden_dim"]
+        output_size = config["neural_network"]["nn_output_dim"]
+        activation = nn.Tanh() # or nn.ReLU() if you prefer
+        ub = config["neural_network"].get("nn_output_ub", 1)
+        
+        return cls(input_size, hidden_size, output_size, activation, ub)
