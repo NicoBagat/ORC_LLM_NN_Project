@@ -5,54 +5,39 @@ steps:
 
 
 ocp:
+  state_dim: 2 # For single pendulum: [angle, angular_velocity]; For double pendulum: [angle1, angular_velocity1, angle2, angular_velocity2]
+  control_dim: 1 # Control input dimension (torque applied to the pendulum)
+  horizon: 20 # Horizon length for generating training data
+  dt: 0.05 # Time step for discretization
+  cost_weights: [1.0, 1.0] # Weights for state dimensions in cost function
   dynamics: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
-  horizon: 10
-  state_dim: 2
-  control_dim: 1
-  dt: 0.1
-
-  cost_weights:
-    state: [1.0, 1.0]  # Weights for state dimemsions
-    control: 0.01      # Weight for control inputs
-
-  initial_states:      # Add this to define initial states for training
-    angle: [1.0, 1.0]               # Range for initial angle (radians)
-    angular_velocity: [-1.0, 1.0]   # Range for initial angular velocity (rad/s)
-
-  num_initial_states: 100 # Number of initial states to generate
-  control_bounds: [-10.0, 10.0] # Range for min/max control variable ('u') values
-  stae_bunds:
-    - [-np.pi, -10.0]
-    - [np.pi, 10.0]
-
-  parameters:
-    gravity: 9.81  # Gravitational accelaration
-    length: 1.0    # Length of the pendulum (single pendulum)
-    mass: 1.0      # Mass of the pendulum (single pendulum)
-    length_1: 1.0  # Length of the 1st rod (double pendulum)
-    length_2: 1.0  # Length of the 2nd rod (double pendulum)
-    mass_1: 1.0    # Mass of the 1st pendulum bob (double pendulum)
-    mass_2: 1.0    # Mass of the 2nd pendulum bob (double pendulum)
-
-
-mpc:
-  short_horizon: 5
-  test_states:
-    - [0.1, 0.2]
-    - [0.3, -0.4]
-
-neural_network:
-  nn_input_dim: # Number of input neurons (#of ocps) || AUTOMATICALLY SET FROM ["ocp"]["state_dim"]
-  nn_hidden_dim: 64 # Number of neurons in hidden layer(s)
-  nn_output_dim: 1 # Number of neurons in output layer
-  nn_epochs: 100
-  nn_batch_size: 32 # 
-  nn_buffer: 1000
-  nn_learning_rate: # step dimension ????
-  nn_activation_function: ReLu
-  nn_loss_function: MSE # loss function is defined as MSE (means square error) in 'train_nn.py'
-  
+ 
 paths:
   training_data: "data/processed/training_data.npy"
   model: "models/neural_network.pt"
-  mpc_results: "data/processed/mpc_results.pt"
+
+neural_networrk:
+  nn_hidden_dim: 32
+  nn_output_dim: 1
+  nn_batch_size: 32
+  nn_epochs: 100
+  nn_learning_ratee: 0.001
+  nn_output_ub: 1
+
+training:
+  initial_states:
+  - [0.0, 0.0]
+  - [0.1, 0.0]
+  - [0.2, 0.0]
+  - [-0.1, 0.0]
+  - [-0.2, 0.0]
+# ... add more as needed ...
+
+mpc:
+  short_horizon: 10 # M
+  long_horizon: 20 # N
+  trst_state:
+  - [0.1, 0.0]
+  - [0.2, 0.0]
+  - [-0.1, 0.0]
+# ... add more as needed ... 
