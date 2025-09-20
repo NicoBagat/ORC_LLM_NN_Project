@@ -1,5 +1,5 @@
 import torch
-from src.ocp_solver import define_ocp
+from define_ocp import define_ocp
 from src.utils import load_model, load_config
 
 def run_mpc_with_nn(config_path="config.yaml", nn_model=None):

@@ -1,5 +1,5 @@
 import numpy as np
-from src.ocp_solver import solve_ocp
+from define_ocp import solve_ocp
 from src.utils import save_data, load_config
 
 def generate_training_data(config):
