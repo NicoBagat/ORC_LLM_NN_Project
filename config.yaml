@@ -36,7 +36,7 @@ training:
 mpc:
   short_horizon: 10 # M
   long_horizon: 20 # N
-  trst_state:
+  test_state:
   - [0.1, 0.0]
   - [0.2, 0.0]
   - [-0.1, 0.0]
