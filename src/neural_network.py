@@ -52,7 +52,7 @@ class NeuralNetwork(nn.Module):
         ub = config["neural_network"].get("nn_output_ub", 1)
         return cls(input_size, hidden_size, output_size, activation, ub)
     
-    
+    # Create a CasADi function from the neural network using l4casadi
     def create_casadi_function(self, config_path, load_weights=True):
         """
         Create a CasADi function from the neural network using l4casadi.
