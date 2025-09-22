@@ -11,7 +11,13 @@ def generate_training_data(config):
     """
     
     N = config["ocp"]["horizon" ] # Long horizon for value function learning
-    test_states = config["training"]["initial_states"] # List of initial states (random or grid)
+    
+    # --- RANDOM SAMPLING ---
+    state_low = np.array([-np.pi, -2.0]) # Lower bounds for [theta, theta_dot]
+    state_high = np.array([ np.pi,  2.0]) # Upper bounds for [theta, theta_dot]
+    N_samples = config["training"]["N_samples"]
+    # test_states = config["training"]["initial_states"] # List of initial states (random or grid)
+    test_states = np.random.uniform(state_low, state_high, (N_samples, len(state_low)))
     training_data = []
     
     for x_init in test_states:
@@ -25,9 +31,9 @@ def generate_training_data(config):
         X = ocp["cs"].MX.sym('X', state_dim, N+1)  # States over the horizon
         U = ocp["cs"].MX.sym('U', control_dim, N)  # Controls over the horizon
         
-        cost = 0 
-        constraints = []
-        constraints.append(X[:,0] - x_init)
+        cost = 0  # Initialize cost
+        constraints = [] # Initialize constraints list
+        constraints.append(X[:,0] - x_init) # Initial condition constraint
         
         for k in range(N):
             x_k = X[:, k]

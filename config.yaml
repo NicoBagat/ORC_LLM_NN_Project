@@ -25,7 +25,8 @@ neural_network:
   nn_output_ub: 1
 
 training:
-  initial_states:
+  N_samples: 500    # Number of random samples for training data generation
+  initial_states:   # Initial states for generating training data
   - [0.0, 0.0]
   - [0.1, 0.0]
   - [0.2, 0.0]

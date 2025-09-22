@@ -1,3 +1,5 @@
+import io
+from contextlib import redirect_stdout, suppress
 from scripts.generate_training_data import generate_training_data
 from scripts.train_nn import train_neural_network
 from scripts.run_mpc_with_nn import run_mpc_with_nn
@@ -8,11 +10,14 @@ def main():
     # Load configuration
     config = load_config("config.yaml")
     
-    # Step 1 : Generate training data
+    # Step 1 : Generate training data (mute output except total count)
     print(f"\n-----------------------------------------------\n")
     print("[STEP_1]: Generating training data ...")
     print(f"\n-----------------------------------------------\n")
-    training_data = generate_training_data(config)
+    
+    f = io.StringIO()
+    with redirect_stdout(f):
+        training_data = generate_training_data(config)
     print(f"Generated {len(training_data)} data points.")
     
     # Step 2: Visualize training data
