@@ -22,10 +22,10 @@ def run_mpc_with_nn(config_path="config.yaml"):
     config = load_config(config_path)
     
     # Load trained neural network model
-    if nn_model is None:
-        nn_model = NeuralNetwork.from_config(config_path)
-        nn_model.load_state_dict(torch.load(config["paths"]["model"], map_location="cpu"))
-        nn_model.eval()
+
+    nn_model = NeuralNetwork.from_config(config_path)
+    nn_model.load_state_dict(torch.load(config["paths"]["model"], map_location="cpu"))
+    nn_model.eval()
 
     # Create CasADi function from PyTorch model using l4casadi
     input_dim = config["ocp"]["state_dim"]
@@ -35,7 +35,7 @@ def run_mpc_with_nn(config_path="config.yaml"):
     
     results = []
     ocp, x, u, dynamics_fn = define_ocp(config)
-    M = config["mpx"]["short_horizon"] # MPC horizon (from config file)
+    M = config["mpc"]["short_horizon"] # MPC horizon (from config file)
     dt = ocp["dt"] # Time step (from config file)
     state_dim = x.size1() # State dimension
     control_dim = u.size1() # Control dimension

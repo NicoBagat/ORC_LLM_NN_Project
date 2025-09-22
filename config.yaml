@@ -14,7 +14,7 @@ ocp:
 
 paths:
   training_data: "data/processed/training_data.npy"
-  model: "models/neural_network.pt"
+  model: "model/neural_network.pt"
 
 neural_network:
   nn_hidden_dim: 32
