@@ -1,91 +1,78 @@
-import l4casadi as l4c
+import casadi as cs
+import numpy as np
 
-def single_pendulum_dynamics(config):    
-    ''' 
-        Define the dynamics for a single pendulum using config dimensions and parameters
-        Args:
-            config (dict): Configuration dictionary loaded from config.yaml
-        
-        Returns:
-            Callable: l4casadi-compatible dynamics function
-        Symbolic dynamics of a single pendulum using l4casadi
-    '''
+def single_pendulum_dynamics(config):
+    """
+    Return a CasADi function f(x, u) for SINGLE PENDULUM DYNAMICS:
+    x = [theta, theta_dot]
+    u = [torque]
+    """
     
-    # Load parameters from configuration file
-    state_dim = config["state_dim"]
-    control_dim = config["control_dim"]
-    g = config["parameters"]["gravity"]
-    L = config["parameters"]["length"]
-    m = config["parameters"]["mass"]
+    g = 9.81 # gravity
+    l = config.get("pendulum_length", 1.0) # length of the pendulum
+    m = config.get("pendulum_mass", 1.0)   # mass of the pendulum
+    b = config.get("pendulum_damping", 0.1) # damping coefficient
     
-    # Symbolic definition of state and control variables
-    x = l4c.SX.sym("x", state_dim)
-    u = l4c.SX.sym("u", control_dim)
-
-    theta, omega = x[0], x[1]
+    x =cs.MX.sym("x", 2)
+    u =cs.MX.sym("u", 1)
+    
+    theta = x[0]
+    theta_dot = x[1]
     torque = u[0]
     
-    # Define the dynamics
-    theta_dot = omega
-    omega_dot = (-m * g * L * l4c.sin(theta) + torque) / (m * L**2)
+    theta_ddot = (torque - b * theta_dot - m * g * l * cs.sin(theta)) / (m * l ** 2)
+    x_dot = cs.vertcat(theta_dot, theta_ddot)
     
-    dxdt = l4c.vertcat(theta_dot, omega_dot)
-    
-    # Create and return the dynamics function
-    dynamics_fn = l4c.Function("single_pendulum_dyunamics", [x, u], [dxdt])
-    return dynamics_fn
+    return cs.Function("f", [x, u], [x_dot])
 
 def double_pendulum_dynamics(config):
+    """ Returns a CasADi function f(x, u) for double pendulum dynamics.
+    
+    x = [theta1, theta2, theta1_dot, theta2_dot]
+    u = [torque]
     """
-    Define the dynamics for a double pendulum.
-    Args:
-        config (dict): Configuration dictionary loaded from config.yaml
-    Returns:
-        Callable: l4casadi-compatible dynamics function.
-    """
-    # Load parameters from configuration file
-    state_dim = config["state_dim"]
-    control_dim = config["control_dim"]
-    g = config["parameters"]["gravity"]
-    L1 = config["parameters"]["length_1"]
-    L2 = config["parameters"]["length_2"]
-    m1 = config["parameters"]["mass_1"]
-    m2 = config["parameters"]["mass_2"]
     
-    # Define the state and control variables
-    x = l4c.SX.sym("x", state_dim)
-    u = l4c.SX.sym("u", control_dim)
+    # Example parameters (customize as needed)
+    g = 9.81  # gravity
+    l1 = config.get("pendulum1_length", 1.0)  # length of the first pendulum
+    l2 = config.get("pendulum2_length", 1.0)  # length of the second pendulum
+    m1 = config.get("pendulum1_mass", 1.0)    # mass of the first pendulum
+    m2 = config.get("pendulum2_mass", 1.0)    # mass of the second pendulum
+    b1 = config.get("pendulum1_damping", 0.1) # damping coefficient for first pendulum
+    b2 = config.get("pendulum2_damping", 0.1) # damping coefficient for second pendulum
+    
+    x = cs.MX.sym("x", 4)
+    u = cs.MX.sym("u", 1)
+    
+    theta1 = x[0]
+    theta2 = x[1]
+    theta1_dot = x[2]
+    theta2_dot = x[3]
+    torque = u[0]
+    
+    # Equations for double pendulum (simpliefied, planar, actuated at first joint)
+    delta = theta2 - theta1
+    den1 = (m1 +m2) *l1 -m2 *l1 * cs.cos(delta) * cs.cos(delta) * cs.cos(delta)
+    den2 = (l2 / l1) * den1
+    
+    theta1_ddot = (
+        m2 * l1 * theta1_dot ** 2 * cs.sin(delta) * cs.cos(delta) 
+        + m2 * g * cs.sin(theta2) * cs.cos(delta)
+        + m2 * l2 * theta2_dot ** 2 * cs.sin(delta)
+        -(m1 + m2) * g * cs.sin(theta1)
+        + torque # torque applied only at first joint
+        - b1 * theta1_dot
+    ) / den1
+    
+    theta2_ddot = (
+        -m2 * l2 * theta2_dot ** 2 * cs.sin(delta) * cs.cos(delta) 
+        + (m1 + m2) * g * cs.sin(theta2) * cs.cos(delta)
+        - (m1 + m2) * l2 * theta2_dot ** 2 * cs.sin(delta)
+        - (m1 + m2) * g * cs.sin(theta1)
+        # torque applied only at first joint
+        - b2 * theta2_dot
+    ) / den2
 
-    # Define the dynamics
-    theta1, omega1, theta2, omega2 = x[0], x[1], x[2], x[3]
-    torque1, torque2 = u[0], u[1]
+    x_dot = cs.vertcat(theta1_dot, theta2_dot, theta1_ddot, theta2_ddot)
     
-    # (angular) Speed
-    theta1_dot = omega1
-    theta2_dot = omega2
-    
-    # (angular) Acceleration 
-    omega1_dot = (m2 * g * l4c.sin(theta2) - m1 * g * L1 * l4c.sin(theta1) + torque1) / (m1 * L1**2)
-    omega2_dot = (m2 * g * l4c.sin(theta2) - m2 * L2 * l4c.sin(theta1) + torque2) / (m2 * L2**2)
-    
-    dxdt = l4c.vertcat(theta1_dot, omega1_dot, theta2_dot, omega2_dot)
-
-
-    # Create and return the dynamics funciton
-    dynamics_fn = l4c.Function("double_pendulum_dynamics", [x, u], [dxdt])
-    return dynamics_fn
-
-# Optional execution block for testing this module directly
-if __name__ == "__main__":
-    
-    # Load configuration file
-    config_path = "config.yaml"
-    config = load_config(config_path)
-    
-    # Test single pendulum dynamics
-    single_ddynamics = single_pendulum_dynamics(config)
-    print("Single pendulum dynamics defined successfully.")
-    
-    # Test double pendulum dynamics
-    doubel_dynamics = double_pendulum_dynamics(config)
-    print("Double pendulum dynamics defined successfully.")
+    return cs.Function("f", [x, u], [x_dot])

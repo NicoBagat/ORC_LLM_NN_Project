@@ -1,3 +1,4 @@
+import os
 import yaml
 import numpy as np
 import torch
@@ -13,7 +14,7 @@ def load_config(config_path = "config.yaml"):
         dict: Parsed configuration dictionary
     """
     with open(config_path, "r") as file:
-        config = yaml.safe_load(file)
+        config = yaml.safe_load(file) # Parse the YAML file
     return config
 
 def save_data(data, path):
@@ -25,8 +26,9 @@ def save_data(data, path):
         data (numpy.ndarray): data to save
         path (str): File path to save the data
         """
-    np.save(path, data)
-    print(f"Data saved to {path}")
+    os.makedirs(os.path.dirname(path), exist_ok=True) # Create directory if it doesn't exist
+    np.save(path, data) # Save the data
+    print(f"Data saved to {path}") 
     
 def load_data(path):
     """
@@ -38,9 +40,9 @@ def load_data(path):
     Returns:
         numpy.ndarray: Loaded data
     """
-    return np.load(path, allow_pickle=True)
+    return np.load(path, allow_pickle=True) # Load the data with allow_pickle=True to handle object arrays
 
-def save_model(model, path):
+def save_model(model, path): 
     """
     Sve a PyTorch model to the specified path.
     
@@ -48,7 +50,8 @@ def save_model(model, path):
         model (torch.nnModule): PyTorch model to save
         path (str): File path to save the model
     """
-    torch.save(model.state_dict(), path)
+    os.makedirs(os.path.dirname(path), exist_ok=True) # Create directory if it doesn't exist
+    torch.save(model.state_dict(), path) # Save only the model parameters
     print(f"Model saved to {path}")
     
 def load_model(path, model_class, config):
@@ -64,7 +67,7 @@ def load_model(path, model_class, config):
         torch.nn.Module: Loaded PyTorch model.
     """
     
-    model = model_class(config)
-    model.load_state_dict(torch.load(path))
-    print(f"Model loaded from {path}")
+    model = model_class(config) # Initialize the model architecture
+    model.load_state_dict(torch.load(path)) # Load the model parameters
+    print(f"Model loaded from {path}") 
     return model
