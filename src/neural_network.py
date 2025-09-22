@@ -33,7 +33,9 @@ class NeuralNetwork(nn.Module):
         self.initialize_weights()
         
     def forward(self, x):
-        out = self.linear_stack(x) * self.ub
+        # - Ensure the output is scaled appropriately
+        # - Ensure `ub` is a float for multiplication
+        out = self.linear_stack(x) * float(self.ub)
         return out
     
     def initialize_weights(self):
