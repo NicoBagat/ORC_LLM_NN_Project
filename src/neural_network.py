@@ -17,7 +17,7 @@ class NeuralNetwork(nn.Module):
     output_size: # output layer neurons
     '''
     
-    def __init__(self, nn_input_dim, nn_hidden_dim, nn_output_dim, activation=nn.Tanh(), ub=1):
+    def __init__(self, nn_input_dim, nn_hidden_dim, nn_output_dim, activation=nn.ReLU(), ub=1):
         super().__init__()
         
         # Define the model architecture
@@ -48,7 +48,7 @@ class NeuralNetwork(nn.Module):
         input_size = config["ocp"]["state_dim"]
         hidden_size = config["neural_network"]["nn_hidden_dim"]
         output_size = config["neural_network"]["nn_output_dim"]
-        activation = nn.Tanh() # or nn.ReLU() if you prefer
+        activation = nn.ReLU() # or nn.ReLU() if you prefer
         ub = config["neural_network"].get("nn_output_ub", 1)
         return cls(input_size, hidden_size, output_size, activation, ub)
     

@@ -9,7 +9,7 @@ def single_pendulum_dynamics(config):
     """
     
     g = 9.81 # gravity
-    l = config.get("penduylum_length", 1.0) # length of the pendulum
+    l = config.get("pendulum_length", 1.0) # length of the pendulum
     m = config.get("pendulum_mass", 1.0)   # mass of the pendulum
     b = config.get("pendulum_damping", 0.1) # damping coefficient
     
