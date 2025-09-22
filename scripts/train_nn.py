@@ -34,8 +34,9 @@ def train_neural_network(config_path="config.yaml"):
     y_data = (y_data - y_mean) / y_std # Normalize 'y' data
     
     # Prepare the Dataloader
-    dataset = TensorDataset(torch.tensor(x_data, dtype=torch.float32),
-                            torch.tensor(y_data, dtype=torch.float32))
+    y_tensor = torch.tensor(y_data, dtype=torch.float32).view(-1, 1)  # Reshape y_data to be a 2D tensor
+
+    dataset = TensorDataset(torch.tensor(x_data, dtype=torch.float32), y_tensor)
     
     dataloader = DataLoader(dataset, batch_size=config["neural_network"]["nn_batch_size"], shuffle=True)
     
