@@ -1,6 +1,6 @@
 #include <l4casadi.hpp>
 
-L4CasADi l4casadi("/home/student/shared/ORC_LLM_NN_Project/_l4c_generated", "l4casadi_f", true, "cpu", true, false);
+L4CasADi l4casadi("/home/student/shared/ORC_LLM_NN_Project/_l4c_generated", "l4casadi_f", true, "cpu", true, true);
 
 #ifdef __cplusplus
 extern "C" {

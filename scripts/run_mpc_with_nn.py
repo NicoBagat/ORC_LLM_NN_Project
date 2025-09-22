@@ -30,7 +30,12 @@ def run_mpc_with_nn(config_path="config.yaml"):
     # Create CasADi function from PyTorch model using l4casadi
     input_dim = config["ocp"]["state_dim"]
     state = cs.MX.sym("x", input_dim)
-    l4c_model = l4c.L4CasADi(nn_model, device='cpu')
+    
+    # Ensure symbolical compatibility
+    nn_model.eval()
+    scripted_nn = torch.jit.script(nn_model)  # Script the model
+    l4c_model = l4c.L4CasADi(scripted_nn, device='cpu')
+    
     nn_casadi = cs.Function('nn_func', [state], [l4c_model(state)])
     
     results = []
