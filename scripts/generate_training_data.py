@@ -52,7 +52,12 @@ def generate_training_data(config):
         x0 = [float(v) for v in x_init] * (N+1)
         u0 = [0.0] * (control_dim * N)
         vars_init = x0 + u0
-        sol = solver(x0=vars_init, lbg=0, ubg=0)
+        
+        try: 
+            sol = solver(x0=vars_init, lbg=0, ubg=0)
+        except RuntimeError as e:
+            print(f"Solver failed for initial state x0={vars_init}: {e}")
+            continue
         J_opt = float(sol['f'].full().item())
         
         training_data.append((np.array(x_init), J_opt))
