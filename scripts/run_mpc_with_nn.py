@@ -1,7 +1,7 @@
 import casadi as cs
 from src.define_ocp import define_ocp
 from src.utils import load_config
-from l4casadi import ONNXFunction
+
 import numpy as np
 import torch
 from src.neural_network import NeuralNetwork    
@@ -22,7 +22,7 @@ def run_mpc_with_nn(config_path="config.yaml"):
     
     # Load ONNX model as CasADi function
     onnx_path = "models/nn_model.onnx"
-    nn_casadi = ONNXFunction(onnx_path, input_names=["input"], output_names=["output"])
+    nn_casadi = ONNX(onnx_path, input_names=["input"], output_names=["output"])
     
     results = []
     ocp, x, u, dynamics_fn = define_ocp(config)

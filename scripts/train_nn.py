@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-from src.neural_network import NeuralNetworkModel
+from src.neural_network import NeuralNetwork
 from src.utils import save_model, load_data, load_config
 
 
@@ -28,8 +28,8 @@ def train_neural_network(config_path="config.yaml"):
     y_mean = np.mean(y_data)        #'y' mean
     y_std = np.std(y_data)          #'y' standard deviation
     
-    x_data = (x_data - x_mean) / x_std
-    y_data = (y_data - y_mean) / y_std
+    x_data = (x_data - x_mean) / x_std  # Normalize 'x' data
+    y_data = (y_data - y_mean) / y_std # Normalize 'y' data
     
     # Prepare the Dataloader
     dataset = TensorDataset(torch.tensor(x_data, dtype=torch.float32),
@@ -38,7 +38,7 @@ def train_neural_network(config_path="config.yaml"):
     dataloader = DataLoader(dataset, batch_size=config["neural_network"]["nn_batch_size"], shuffle=True)
     
     # INITIALIZE THE NEURAL NETWORK
-    nn_model = NeuralNetworkModel(config_path)
+    nn_model = NeuralNetwork(config_path)
     optimizer = torch.optim.Adam(nn_model.parameters(), lr=config["neural_network"]["nn_learning_rate"])
     loss_fn = torch.nn.MSELoss() #Criterion for MSE (Mean Square Error) measurement
     
@@ -46,9 +46,9 @@ def train_neural_network(config_path="config.yaml"):
     for epoch in range(config["neural_network"]["nn_epochs"]):
         for x_batch, y_batch in dataloader:
             optimizer.zero_grad()   #Reset the gradients for all optimized class
-            predictions = nn_model(x_batch)
-            loss = loss_fn(predictions, y_batch)
-            loss.backward()
+            predictions = nn_model(x_batch) #Forward pass: compute predicted y by passing x to the model
+            loss = loss_fn(predictions, y_batch) #Compute the loss
+            loss.backward() 
             
             '''
             backward(): method used in PyTorch to calculate the gradient dureing the backward pass in the neural network.
@@ -59,6 +59,7 @@ def train_neural_network(config_path="config.yaml"):
     
     # Save the trained model
     save_model(nn_model, config_path["paths"]["model"])
+    print("Neural network training complete.")
     return nn_model
     
     

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from utils import load_config
+from src.utils import load_config
 from casadi import MX, Function
 import l4casadi as l4c
 
