@@ -25,8 +25,7 @@ def main():
     # Output results (example)
     print("MPC Results:")
     for i, result in enumerate(mpc_results):
-        trajectory, controls, cost = result
-        print(f"Simulation {i+1}: Cost = {cost}")
+        print(f"Simulation {i+1}: Cost = {result['cost']}")
 
 if __name__ == "__main__":
     main()
