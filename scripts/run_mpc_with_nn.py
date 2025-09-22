@@ -1,4 +1,5 @@
 import casadi as cs
+import l4casadi as l4c
 from src.define_ocp import define_ocp
 from src.utils import load_config
 
@@ -20,9 +21,17 @@ def run_mpc_with_nn(config_path="config.yaml"):
     # Load configuration
     config = load_config(config_path)
     
-    # Load ONNX model as CasADi function
-    onnx_path = "models/nn_model.onnx"
-    nn_casadi = ONNX(onnx_path, input_names=["input"], output_names=["output"])
+    # Load trained neural network model
+    if nn_model is None:
+        nn_model = NeuralNetwork.from_config(config_path)
+        nn_model.load_state_dict(torch.load(config["paths"]["model"], map_location="cpu"))
+        nn_model.eval()
+
+    # Create CasADi function from PyTorch model using l4casadi
+    input_dim = config["ocp"]["state_dim"]
+    state = cs.MX.sym("x", input_dim)
+    l4c_model = l4c.L4CasADi(nn_model, device='cpu')
+    nn_casadi = cs.Function('nn_func', [state], [l4c_model(state)])
     
     results = []
     ocp, x, u, dynamics_fn = define_ocp(config)
