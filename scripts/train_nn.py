@@ -17,7 +17,7 @@ def train_neural_network(config_path="config.yaml"):
     config = load_config(config_path)
     
     # Load trainig data
-    training_data = load_data(config["paths"]["training-data"])
+    training_data = load_data(config["paths"]["training_data"])
     x_data, y_data = zip(*training_data)
     x_data, y_data = np.array(x_data), np.array(y_data)
     

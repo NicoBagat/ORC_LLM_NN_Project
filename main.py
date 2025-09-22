@@ -20,7 +20,7 @@ def main():
     
     # Step 3: Train neural network
     print("[STEP_3]: Training neural network ...")
-    nn_model = train_neural_network(config)
+    nn_model = train_neural_network("config.yaml")
     print("Neural network training complete.")
     
     # Step 4: Run MPC with trained neural network
