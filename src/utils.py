@@ -1,3 +1,4 @@
+import os
 import yaml
 import numpy as np
 import torch
@@ -25,6 +26,7 @@ def save_data(data, path):
         data (numpy.ndarray): data to save
         path (str): File path to save the data
         """
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     np.save(path, data)
     print(f"Data saved to {path}")
     
