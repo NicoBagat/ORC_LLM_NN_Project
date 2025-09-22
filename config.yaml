@@ -11,17 +11,17 @@ ocp:
   dt: 0.05 # Time step for discretization
   cost_weights: [1.0, 1.0] # Weights for state dimensions in cost function
   dynamics: single_pendulum  # Choose between 'single_pendulum' or 'double_pendulum'
- 
+
 paths:
   training_data: "data/processed/training_data.npy"
   model: "models/neural_network.pt"
 
-neural_networrk:
+neural_network:
   nn_hidden_dim: 32
   nn_output_dim: 1
   nn_batch_size: 32
   nn_epochs: 100
-  nn_learning_ratee: 0.001
+  nn_learning_rate: 0.001
   nn_output_ub: 1
 
 training:
@@ -36,7 +36,7 @@ training:
 mpc:
   short_horizon: 10 # M
   long_horizon: 20 # N
-  test_state:
+  test_states:
   - [0.1, 0.0]
   - [0.2, 0.0]
   - [-0.1, 0.0]

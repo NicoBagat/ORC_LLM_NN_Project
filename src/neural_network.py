@@ -17,16 +17,16 @@ class NeuralNetwork(nn.Module):
     output_size: # output layer neurons
     '''
     
-    def __init__(self, input_size, hidden_size, output_size, activation=nn.Tanh(), ub=1):
+    def __init__(self, nn_input_dim, nn_hidden_dim, nn_output_dim, activation=nn.Tanh(), ub=1):
         super().__init__()
         
         # Define the model architecture
         self.linear_stack = nn.Sequential(
-            nn.Linear(input_size, hidden_size),
+            nn.Linear(nn_input_dim, nn_hidden_dim),
             activation,
-            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(nn_hidden_dim, nn_hidden_dim),
             activation,
-            nn.Linear(hidden_size, output_size),
+            nn.Linear(nn_hidden_dim, nn_output_dim),
             activation,
         )
         self.ub = ub
